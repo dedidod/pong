@@ -1,0 +1,206 @@
+package testing;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.*;
+import javax.swing.Box.Filler;
+
+public class Ball extends JPanel {
+
+	public int xPos = 250, dx = 5, dy = 5;
+	public int yPos = 250;
+	public int radius = 25;
+	public int move = 0;
+	public int player1y = 200;
+	public int player2y = 200;
+	public int player1x = 0;
+	public int player1w = 20;
+	public int player1h = 80;
+	public int player2w = 20;
+	public int player2h = 80;
+	public int player2x = 800 - player2w;
+
+	public int player1move = 30;
+	public int player2move = 30;
+
+	public int keyPress = 0;
+	public int keyRelease = 0;
+
+	public int score1 = 0;
+	public int score2 = 0;
+
+	int Tsleep = 15;
+
+	String win = "";
+
+	boolean finish = true;
+
+	// boolean up, down, left, right;
+
+	public Ball() {
+
+		KeyListener listener = new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				keyPress = e.getKeyCode();
+
+				if (player1y + player1h >= 450) {
+					player1y = 450 - player1h;
+				}
+				if (player1y <= 0) {
+					player1y = 0;
+				}
+				if (player2y + player2h >= 450) {
+					player2y = 450 - player2h;
+				}
+				if (player2y <= 0) {
+					player2y = 0;
+				}
+				if (keyPress == KeyEvent.VK_S) {
+					player1y += player1move;
+				}
+				if (keyPress == KeyEvent.VK_W) {
+					player1y -= player1move;
+				}
+				if (keyPress == KeyEvent.VK_UP) {
+					player2y -= player2move;
+				}
+				if (keyPress == KeyEvent.VK_DOWN) {
+					player2y += player2move;
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+		};
+		addKeyListener(listener);
+		setFocusable(true);
+
+	}
+
+	// scoring system
+
+	// public void for movement of ball
+	public void Move() {
+		// movement for boundaries of jframe
+		xPos += dx;
+		yPos += dy;
+
+		if (xPos <= 0 + radius) {
+			dx = Math.abs(dx);
+		}
+		if (xPos >= 815 - radius) {
+			dx = -Math.abs(dx);
+
+		}
+		if (yPos <= 0 + radius) {
+			dy = Math.abs(dy);
+		}
+		if (yPos >= 500 - radius) {
+			dy = -Math.abs(dy);
+		}
+
+		// movement for interaction player 1 front
+		if (xPos <= player1x + player1w + radius && yPos >= player1y
+				&& yPos <= player1y + player1h) {
+			if (dy > 0) {
+				dx = Math.abs(dx);
+				dy = Math.abs(dy);
+			}
+			if (dy < 0) {
+				dx = Math.abs(dx);
+				dy = -Math.abs(dy);
+			}
+		}
+		// movement for interaction player 2 front
+		if (xPos >= player2x - radius / 2 && yPos >= player2y
+				&& yPos <= player2y + player1h) {
+			if (dy < 0) {
+				dx = -Math.abs(dx);
+				dy = -Math.abs(dy);
+			}
+			if (dy > 0) {
+				dx = -Math.abs(dx);
+				dy = Math.abs(dy);
+
+			}
+		}
+		// movement for interaction player 1 sidessss
+		if (xPos >= 0 + radius && xPos < player1w + radius
+				&& yPos == player1y + player1h + radius) {
+			dy = Math.abs(dy);
+		}
+		if (xPos >= 0 + radius && xPos < player1w + radius
+				&& yPos == player1y - radius) {
+			dy = -Math.abs(dy);
+		}
+
+		// movement for interaction player 2 sidessss
+		if (xPos <= 815 + radius && xPos > 815 - radius - player1w
+				&& yPos == player2y - radius) {
+			dy = -Math.abs(dy);
+		}
+		if (xPos <= 815 + radius && xPos > 815 - radius - player1w
+				&& yPos == player2y + radius + player2h) {
+			dy = Math.abs(dy);
+		}
+
+	}
+
+	// The circle and palyer tings
+	public void paintComponent(Graphics g) {
+		// circle
+
+		Font font = new Font("Serif", Font.ITALIC, 20);
+
+		super.paintComponent(g);
+		g.setColor(Color.BLUE);
+		// player 1 square
+		g.fillRect(player1x, player1y, player1w, player1h);
+		// player 2 square
+		g.setColor(Color.RED);
+		g.fillRect(player2x, player2y, player2w, player2h);
+		g.setColor(Color.MAGENTA);
+		g.fillOval(xPos - radius, yPos - radius, radius, radius);
+		g.setColor(Color.BLACK);
+		g.setFont(font);
+		if (xPos - radius == 0) {
+			score2++;
+		}
+		if (xPos + radius == 815) {
+			score1++;
+		}
+		if (score1 >= 6) {
+			g.drawString("Player One Wins !!!", 320, 200);
+			finish = false;
+		}
+		if (score2 >= 6) {
+			g.drawString("Player Two Wins !!!", 320, 220);
+			finish = false;
+		}
+		String player1score = Integer.toString(score1);
+		String player2score = Integer.toString(score2);
+		g.drawString("Player One Score : " + player1score, 100, 20);
+		g.drawString("Player Two Score : " + player2score, 550, 20);
+		if (finish == true) {
+			Move();
+			repaint();
+		}
+		// Delay for ball move
+
+		try {
+			Thread.sleep(Tsleep);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+}
